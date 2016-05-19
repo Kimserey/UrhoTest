@@ -80,6 +80,12 @@
   <ItemGroup>
     <Content Include="UrhoSharpReadme.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FirstGame.Core\FirstGame.Core.fsproj">
+      <Project>{4c0bef95-9ae0-413c-ad93-5101dc8cb629}</Project>
+      <Name>FirstGame.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\UrhoSharp.1.0.500\build\MonoAndroid\UrhoSharp.targets" Condition="Exists('..\packages\UrhoSharp.1.0.500\build\MonoAndroid\UrhoSharp.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
