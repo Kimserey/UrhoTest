@@ -21,6 +21,6 @@ module Game =
             helloText.SetColor (new Color(0.f, 1.f, 0.f))
             
             let f = cache.GetFont("Fonts/Anonymous Pro.ttf")
-            helloText.SetFont(f, 30) |> ignore
+            helloText.SetFont(f, 20) |> ignore
             
             this.UI.Root.AddChild(helloText)
