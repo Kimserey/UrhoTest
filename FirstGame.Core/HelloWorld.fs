@@ -3,7 +3,7 @@
 open Urho
 open Urho.Gui
 
-module Game =
+module HelloWorld =
     
     type App(opt: ApplicationOptions) =
         inherit Application(opt)

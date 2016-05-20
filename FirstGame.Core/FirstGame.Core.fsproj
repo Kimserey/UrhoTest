@@ -42,7 +42,8 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="packages.config" />
-    <Compile Include="Game.fs" />
+    <Compile Include="HelloWorld.fs" />
+    <Compile Include="Physics.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
