@@ -17,7 +17,7 @@ namespace FirstGame
         {
             base.OnCreate(bundle);
             var mLayout = new AbsoluteLayout(this);
-            var surface = UrhoSurface.CreateSurface<HelloWorld.App>(this);
+            var surface = UrhoSurface.CreateSurface<Physics.App>(this, new Urho.ApplicationOptions("Data"));
             mLayout.AddView(surface);
             SetContentView(mLayout);
         }

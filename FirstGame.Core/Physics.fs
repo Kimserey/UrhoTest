@@ -16,6 +16,7 @@ module Physics =
         let nextRandomRange range = nextRandom() * range
         let nextRandomBetween min max = nextRandom() * (max - min) + min
         let nextRandomBetweenInt min max = random.Next(min, max)
+        let pixelSize = 0.01f
 
         override this.Start() =
             base.Start()
@@ -25,26 +26,26 @@ module Physics =
             scene.CreateComponent<DebugRenderer>() |> ignore
             scene.CreateComponent<PhysicsWorld2D>() |> ignore
 
-            let ballSprite = base.ResourceCache.GetSprite2D("Images/Ball.png")
+            let cameraNode = scene.CreateChild("Camera")
+            cameraNode.Position <- new Vector3(0.0f, 0.0f, -10.0f)
+
+            let camera = cameraNode.CreateComponent<Camera>()
+            camera.Orthographic <- true
+            
+            let graphics = base.Graphics
+            camera.OrthoSize <- (float32 graphics.Height) * pixelSize
+
+            let cache = base.ResourceCache
+            let ballSprite = cache.GetSprite2D("Images/Ball.png")
+
+            let halfWidth = (float32 graphics.Width) * 0.5f * pixelSize
+            let halfHeight = (float32 graphics.Height) * 0.5f * pixelSize
 
             [0..99]
             |> List.iter(fun i ->
-                let node = scene.CreateChild("RigidBody")
-                node.Position <- new Vector3(nextRandomBetween -0.1f 0.1f, 5.f + (float32 i) * 0.4f, 0.f)
-                let body = node.CreateComponent<RigidBody2D>()
-                body.BodyType <- BodyType2D.Dynamic
+                let node = scene.CreateChild("StaticSprite2D")
+                node.Position <- new Vector3(nextRandomBetween (-1.0f * halfWidth) halfWidth, nextRandomBetween (-1.0f * halfHeight) halfHeight, 0.f)
                 let sprite = node.CreateComponent<StaticSprite2D>()
-                sprite.Sprite <- ballSprite
-                let circle = node.CreateComponent<CollisionCircle2D>()
-                circle.Radius <- 0.16f
-                circle.Density <- 1.0f
-                circle.Friction <- 0.5f
-                circle.Restitution <- 0.1f)
-            ()
+                sprite.Sprite <- ballSprite)
 
-            let cameraNode = scene.CreateChild("Camera")
-            cameraNode.Position <- new Vector3(0.0f, 0.0f, -10.0f)
-            let camera = cameraNode.CreateComponent<Camera>()
-            camera.Orthographic <- true
-
-            base.Renderer.SetViewport(uint32 0, new Viewport(scene, camera, null))
+            base.Renderer.SetViewport(uint32 0, new Viewport(base.Context, scene, cameraNode.GetComponent<Camera>(), null))
