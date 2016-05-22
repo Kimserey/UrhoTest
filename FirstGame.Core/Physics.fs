@@ -32,9 +32,7 @@ module Physics =
     type App(opt: ApplicationOptions) =
         inherit Application(opt)
 
-        let random = new Random()
         let pixelSize = 0.01f
-        let negate x = x * -1.f
         
         override this.Start() =
             base.Start()
@@ -76,9 +74,7 @@ module Physics =
             boxNode.SubscribeToNodeCollision(fun args ->
                 match args.OtherNode.Name with
                 | "Ground" -> 
-                    args.Body.Node.Position <- initialPosition
-                    args.Body.SetLinearVelocity(Vector3.Zero)
-                    args.Body.SetAngularVelocity(Vector3.Zero)
+                    args.Body.SetLinearVelocity(new Vector3(0.0f, 7.0f, 0.0f))
                 | _ -> ()) 
             |> ignore
 
@@ -86,8 +82,8 @@ module Physics =
             let groundNode = scene.CreateChild("Ground")
             groundNode.AddComponent(ground)
             ground.Play text
-                <| new Vector3(0.0f, -3.0f, 0.0f)
-                <| new Vector3(3.0f, 1.0f, 1.0f)
+                <| new Vector3(0.0f, -4.0f, 0.0f)
+                <| new Vector3(5.0f, 1.0f, 1.0f)
                 <| true
                             
             base.Renderer.SetViewport(uint32 0, new Viewport(base.Context, scene, cameraNode.GetComponent<Camera>(), null))
