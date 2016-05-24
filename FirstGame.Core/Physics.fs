@@ -9,24 +9,52 @@ open Urho.Urho2D
 
 module Physics =
 
+    type Vector2 with
+        static member FromVector3 (vec3: Vector3) =
+            new Vector2(vec3.X, vec3.Y)
+
     type Box() =
         inherit Component()
                 
-        member this.Play (text: Text) position scale isKinematic =
+        member this.Play position scale bodyType =
             this.Node.Position <- position
             this.Node.Scale <- scale
-            // Add a rigid body to the box
-            let body = this.Node.CreateComponent<RigidBody>()
-            body.Mass <- 1.0f
-            body.Kinematic <- isKinematic
 
+            // Add a rigid body to the box
+            let body = this.Node.CreateComponent<RigidBody2D>()
+            body.BodyType <- bodyType
+            
             // Add a collision shape to the box
-            let collision = this.Node.CreateComponent<CollisionShape>()
-            collision.SetBox(Vector3.Multiply(new Vector3(0.32f, 0.33f, 0.32f), scale), Vector3.Zero, Quaternion.Identity)
+            let collision = this.Node.CreateComponent<CollisionBox2D>()
+            collision.Size <- Vector2.Multiply(Vector2.FromVector3 scale, new Vector2(0.32f, 0.32f))
+            collision.Friction <- 0.5f
 
             // Set the sprite image
             let sprite = this.Node.CreateComponent<StaticSprite2D>()
             sprite.Sprite <- this.Application.ResourceCache.GetSprite2D("Images/Box.png")
+
+    
+    type Ball() =
+        inherit Component()
+
+        member this.Play position scale bodyType =
+            this.Node.Position <- position
+            this.Node.Scale <- scale
+
+            // Add a rigid body to the box
+            let body = this.Node.CreateComponent<RigidBody2D>()
+            body.BodyType <- bodyType
+
+            // Add a collision shape to the box
+            let collision = this.Node.CreateComponent<CollisionCircle2D>()
+            collision.Radius <- 0.16f
+            collision.Density <- 1.0f
+            collision.Friction <- 0.5f
+            collision.Restitution <- 0.1f
+
+            // Set the sprite image
+            let sprite = this.Node.CreateComponent<StaticSprite2D>()
+            sprite.Sprite <- this.Application.ResourceCache.GetSprite2D("Images/Ball.png")
 
 
     type App(opt: ApplicationOptions) =
@@ -63,27 +91,20 @@ module Physics =
             base.UI.SubscribeToUIMouseClick(fun args -> text.Value <- "Button clicked") |> ignore
 
             let initialPosition = new Vector3(0.0f, 3.0f, 0.0f)
-            let box= new Box()
-            let boxNode = scene.CreateChild("Box")
-            boxNode.AddComponent(box)
-            box.Play text
+            let ball = new Ball()
+            let ballNode = scene.CreateChild("Ball")
+            ballNode.AddComponent(ball)
+            ball.Play
                 <| initialPosition
-                <| new Vector3(1.0f, 1.0f, 1.0f)
-                <| false
+                <| new Vector3(1.0f, 1.0f, 0.0f)
+                <| BodyType2D.Dynamic
 
-            boxNode.SubscribeToNodeCollision(fun args ->
-                match args.OtherNode.Name with
-                | "Ground" -> 
-                    args.Body.SetLinearVelocity(new Vector3(0.0f, 7.0f, 0.0f))
-                | _ -> ()) 
-            |> ignore
-
-            let ground = new Box()
-            let groundNode = scene.CreateChild("Ground")
-            groundNode.AddComponent(ground)
-            ground.Play text
+            let box = new Box()
+            let boxNode = scene.CreateChild("Ground")
+            boxNode.AddComponent(box)
+            box.Play
                 <| new Vector3(0.0f, -4.0f, 0.0f)
-                <| new Vector3(5.0f, 1.0f, 1.0f)
-                <| true
+                <| new Vector3(5.0f, 1.0f, 0.0f)
+                <| BodyType2D.Kinematic
                             
             base.Renderer.SetViewport(uint32 0, new Viewport(base.Context, scene, cameraNode.GetComponent<Camera>(), null))
