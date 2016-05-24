@@ -68,7 +68,7 @@ module Physics =
             let scene = new Scene()
             scene.CreateComponent<Octree>() |> ignore
             scene.CreateComponent<DebugRenderer>() |> ignore
-            scene.CreateComponent<PhysicsWorld2D>() |> ignore
+            let physicsWorld2D = scene.CreateComponent<PhysicsWorld2D>()
 
             let cameraNode = scene.CreateChild("Camera")
             cameraNode.Position <- new Vector3(0.0f, 0.0f, -10.0f)
@@ -106,5 +106,16 @@ module Physics =
                 <| new Vector3(0.0f, -4.0f, 0.0f)
                 <| new Vector3(5.0f, 1.0f, 0.0f)
                 <| BodyType2D.Kinematic
-                            
+                      
+            // check why collision is only detected one time      
+            physicsWorld2D.SubscribeToPhysicsBeginContact2D(fun args ->
+                let setVelocity (body: RigidBody2D) =
+                    body.SetLinearVelocity(new Vector2(0.0f, 10.0f))
+                
+                match args.NodeA.Name, args.NodeB.Name with
+                | "Ball", "Ground" -> setVelocity(args.BodyA)
+                | "Ground", "Ball" -> setVelocity(args.BodyB)
+                | _ -> ())
+            |> ignore
+
             base.Renderer.SetViewport(uint32 0, new Viewport(base.Context, scene, cameraNode.GetComponent<Camera>(), null))
